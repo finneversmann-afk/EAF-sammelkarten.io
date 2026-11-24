@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <title>Aetherforge – Premium TCG Pack Opening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --bg-deep: #07070a;
+  --bg-main: #0c0c10;
+  --bg-card: #14141a;
+  --bg-elevated: #1a1a22;
+  --bg-hover: #22222c;
+  --gold: #d4af37;
+  --gold-light: #f0d878;
+  --gold-dark: #a88b2a;
+  --accent: #7b5cff;
+  --accent-glow: rgba(123, 92, 255, 0.35);
+  --text: #f0f0f5;
+  --text-dim: #9898a8;
+  --text-muted: #6a6a7a;
+  --success: #3dd68c;
+  --danger: #ff5c5c;
+  --rare-common: #9aa0a6;
+  --rare-uncommon: #4ade80;
+  --rare-rare: #60a5fa;
+  --rare-double: #a78bfa;
+  --rare-ultra: #f472b6;
+  --rare-illustration: #fb923c;
+  --rare-special: #facc15;
+  --rare-hyper: #ef4444;
+  --rare-secret: #e879f9;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-height: 68px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+#app {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ===== LOADING ===== */
+#loading-screen {
+  background: var(--bg-deep);
+  align-items: center;
+  justify-content: center;
+}
+.loader {
+  text-align: center;
+}
+.loader-ring {
+  width: 64px;
+  height: 64px;
+  border: 3px solid rgba(212, 175, 55, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.loader-sub {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ===== TOP BAR ===== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  background: linear-gradient(180deg, rgba(10,10,14,0.95), rgba(10,10,14,0.7));
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  z-index: 50;
+  flex-shrink: 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.brand-icon {
+  color: var(--gold);
+  font-size: 18px;
+}
+.brand-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+}
+.top-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+  border: 1px solid rgba(212,175,55,0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.coin-icon {
+  color: var(--gold);
+  font-size: 14px;
+}
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:active {
+  transform: scale(0.92);
+  background: var(--bg-hover);
+}
+
+/* ===== CONTENT ===== */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  padding-bottom: calc(var(--nav-height) + 20px + var(--safe-bottom));
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  display: flex;
+  background: rgba(12,12,16,0.92);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  z-index: 50;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 6px 0;
+}
+.nav-btn .nav-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.nav-btn.active {
+  color: var(--gold);
+}
+.nav-btn:active {
+  opacity: 0.7;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: #1a1400;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(212,175,55,0.25);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(212,175,55,0.2);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 11px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:active {
+  background: var(--bg-hover);
+}
+.btn-danger {
+  background: rgba(255,92,92,0.15);
+  color: var(--danger);
+  border: 1px solid rgba(255,92,92,0.3);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===== CARDS (UI) ===== */
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+@media (min-width: 600px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+/* ===== PACK CARDS ===== */
+.pack-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.07);
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+.pack-card:active {
+  transform: scale(0.98);
+}
+.pack-visual-preview {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.pack-visual-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.6));
+}
+.pack-info {
+  padding: 12px;
+}
+.pack-name {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.pack-price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 13px;
+}
+.pack-rarity-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ===== TCG CARD ===== */
+.tcg-card {
+  aspect-ratio: 63/88;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 2px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.tcg-card .card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.tcg-card .card-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.tcg-card .card-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 6px 6px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tcg-card .card-rarity {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tcg-card .card-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255,255,255,0.15) 40%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0.15) 60%,
+    transparent 80%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.tcg-card.holo .card-shine {
+  opacity: 0.7;
+  animation: shine-move 3s ease-in-out infinite;
+}
+@keyframes shine-move {
+  0%, 100% { transform: translateX(-60%) skewX(-15deg); }
+  50% { transform: translateX(60%) skewX(-15deg); }
+}
+.tcg-card.gold-border {
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(212,175,55,0.35), 0 8px 24px rgba(0,0,0,0.4);
+}
+.tcg-card.rainbow-border {
+  border-image: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff) 1;
+  box-shadow: 0 0 24px rgba(255,150,200,0.3);
+}
+
+/* Rarity colors */
+.rarity-common { background: var(--rare-common); color: #111; }
+.rarity-uncommon { background: var(--rare-uncommon); color: #111; }
+.rarity-rare { background: var(--rare-rare); color: #111; }
+.rarity-double { background: var(--rare-double); color: #111; }
+.rarity-ultra { background: var(--rare-ultra); color: #111; }
+.rarity-illustration { background: var(--rare-illustration); color: #111; }
+.rarity-special { background: var(--rare-special); color: #111; }
+.rarity-hyper { background: var(--rare-hyper); color: #fff; }
+.rarity-secret { background: var(--rare-secret); color: #111; }
+
+/* ===== HOME VIEW ===== */
+.home-header {
+  margin-bottom: 20px;
+}
+.welcome-text {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.progress-bar-wrap {
+  margin: 16px 0;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.progress-bar {
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.stat-box {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.recent-pulls {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.recent-pulls .tcg-card {
+  width: 90px;
+  flex-shrink: 0;
+}
+
+/* ===== SHOP ===== */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 500px) {
+  .shop-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 800px) {
+  .shop-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== COLLECTION ===== */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.filter-chip.active {
+  background: rgba(212,175,55,0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.search-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 12px;
+  outline: none;
+}
+.search-input:focus {
+  border-color: var(--gold);
+}
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ===== BINDER ===== */
+.binder-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+.binder-page {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+.binder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.binder-slot {
+  aspect-ratio: 63/88;
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed rgba(255,255,255,0.12);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.binder-slot.filled {
+  border-style: solid;
+  border-color: rgba(255,255,255,0.15);
+}
+.binder-slot .tcg-card {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+/* ===== MARKET ===== */
+.market-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.market-item .tcg-card {
+  width: 56px;
+  flex-shrink: 0;
+}
+.market-info {
+  flex: 1;
+  min-width: 0;
+}
+.market-name {
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.market-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.market-price {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ===== STATS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.stats-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.stats-card .label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.stats-card .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+/* ===== SETTINGS ===== */
+.settings-group {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.settings-item:last-child {
+  border-bottom: none;
+}
+.settings-item label {
+  font-size: 14px;
+}
+.toggle {
+  width: 48px;
+  height: 28px;
+  background: var(--bg-elevated);
+  border-radius: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.toggle.on {
+  background: rgba(212,175,55,0.3);
+  border-color: var(--gold);
+}
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+}
+.toggle.on::after {
+  transform: translateX(20px);
+  background: var(--gold);
+}
+
+/* ===== OVERLAYS & MODALS ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay.active {
+  display: flex;
+}
+.modal-content {
+  background: var(--bg-main);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+.admin-login input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 15px;
+  margin: 16px 0 8px;
+  outline: none;
+}
+.admin-login input:focus {
+  border-color: var(--gold);
+}
+.admin-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* ===== PACK OPENING ===== */
+#opening-overlay {
+  background: #050508;
+  flex-direction: column;
+}
+.opening-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.pack-visual {
+  width: 200px;
+  height: 280px;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+.pack-visual.shake {
+  animation: pack-shake 0.5s ease-in-out;
+}
+@keyframes pack-shake {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-6deg) scale(1.02); }
+  40% { transform: rotate(6deg) scale(1.02); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(4deg); }
+}
+.pack-visual.opened {
+  transform: scale(0.3) translateY(-80px);
+  opacity: 0;
+}
+.cards-reveal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  min-height: 160px;
+}
+.cards-reveal .tcg-card {
+  width: 110px;
+  opacity: 0;
+  transform: scale(0.6) translateY(40px);
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cards-reveal .tcg-card.revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.cards-reveal .tcg-card.special-reveal {
+  animation: special-pulse 0.8s ease;
+}
+@keyframes special-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); }
+  50% { box-shadow: 0 0 40px 10px rgba(212,175,55,0.4); }
+  100% { box-shadow: 0 0 20px 0 rgba(212,175,55,0.2); }
+}
+.hidden {
+  display: none !important;
+}
+
+/* ===== ADMIN PANEL ===== */
+.admin-panel {
+  padding-bottom: 40px;
+}
+.admin-section {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.admin-section-header {
+  padding: 14px 16px;
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(212,175,55,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--gold);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+.admin-section-body {
+  padding: 16px;
+  display: none;
+}
+.admin-section.open .admin-section-body {
+  display: block;
+}
+.form-row {
+  margin-bottom: 12px;
+}
+.form-row label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: var(--gold);
+}
+.form-row textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.quick-btn {
+  padding: 8px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.quick-btn:active {
+  background: var(--bg-hover);
+}
+.quick-btn.gold {
+  background: rgba(212,175,55,0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ===== TOAST ===== */
+#toast-container {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: toast-in 0.3s ease;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.success {
+  border-color: rgba(61,214,140,0.4);
+}
+.toast.error {
+  border-color: rgba(255,92,92,0.4);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+.empty-state .icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* ===== TASKS ===== */
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.task-item.completed {
+  opacity: 0.55;
+}
+.task-info {
+  flex: 1;
+}
+.task-title {
+  font-weight: 600;
+  font-size: 13px;
+}
+.task-progress {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.task-reward {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Scrollbar subtle */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="loading-screen" class="screen active">
+      <div class="loader">
+        <div class="loader-ring"></div>
+        <div class="loader-text">AETHERFORGE</div>
+        <div class="loader-sub">Lade Spielstand...</div>
+      </div>
+    </div>
+
+    <div id="main-app" class="screen">
+      <header class="top-bar">
+        <div class="brand" onclick="App.navigate('home')">
+          <span class="brand-icon">✦</span>
+          <span class="brand-name">AETHERFORGE</span>
+        </div>
+        <div class="top-stats">
+          <div class="coin-display" id="coin-display">
+            <span class="coin-icon">◉</span>
+            <span id="coin-amount">5.000</span>
+          </div>
+          <button class="icon-btn" id="btn-settings" title="Einstellungen">⚙</button>
+        </div>
+      </header>
+
+      <main id="content" class="content"></main>
+
+      <nav class="bottom-nav">
+        <button class="nav-btn active" data-view="home">
+          <span class="nav-icon">⌂</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-btn" data-view="shop">
+          <span class="nav-icon">▣</span>
+          <span class="nav-label">Shop</span>
+        </button>
+        <button class="nav-btn" data-view="collection">
+          <span class="nav-icon">▤</span>
+          <span class="nav-label">Sammlung</span>
+        </button>
+        <button class="nav-btn" data-view="binder">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Binder</span>
+        </button>
+        <button class="nav-btn" data-view="market">
+          <span class="nav-icon">⇄</span>
+          <span class="nav-label">Markt</span>
+        </button>
+        <button class="nav-btn" data-view="stats">
+          <span class="nav-icon">◔</span>
+          <span class="nav-label">Stats</span>
+        </button>
+      </nav>
+    </div>
+
+    <div id="opening-overlay" class="overlay">
+      <div class="opening-container">
+        <div id="pack-visual" class="pack-visual"></div>
+        <div id="cards-reveal" class="cards-reveal"></div>
+        <button id="btn-skip-anim" class="btn-secondary">Überspringen</button>
+        <button id="btn-continue-opening" class="btn-primary hidden">Weiter</button>
+      </div>
+    </div>
+
+    <div id="card-modal" class="overlay">
+      <div class="modal-content card-detail-modal">
+        <button class="modal-close" id="close-card-modal">×</button>
+        <div id="card-detail-content"></div>
+      </div>
+    </div>
+
+    <div id="admin-login-modal" class="overlay">
+      <div class="modal-content admin-login">
+        <h2>Admin Zugang</h2>
+        <p>Nur für den Besitzer</p>
+        <input type="password" id="admin-password" placeholder="Passwort eingeben" autocomplete="off" />
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancel-admin-login">Abbrechen</button>
+          <button class="btn-primary" id="confirm-admin-login">Einloggen</button>
+        </div>
+        <p class="admin-hint">Standard: aether2026</p>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+  </div>
+
+  <script>
+// ===== STORAGE LAYER (LocalStorage + IndexedDB for images) =====
+
+const Storage = {
+  DB_NAME: 'AetherforgeDB',
+  DB_VERSION: 1,
+  db: null,
+
+  async init() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        this.db = request.result;
+        resolve();
+      };
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('images')) {
+          db.createObjectStore('images', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('customCards')) {
+          db.createObjectStore('customCards', { keyPath: 'id' });
+        }
+      };
+    });
+  },
+
+  // LocalStorage helpers
+  get(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem('aether_' + key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  },
+
+  set(key, value) {
+    try {
+      localStorage.setItem('aether_' + key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('Storage full or error', e);
+    }
+  },
+
+  // Image storage in IndexedDB
+  async saveImage(id, dataUrl) {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.put({ id, data: dataUrl, ts: Date.now() });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  async getImage(id) {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('images', 'readonly');
+      const store = tx.objectStore('images');
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result ? req.result.data : null);
+      req.onerror = () => reject(req.error);
+    });
+  },
+
+  async deleteImage(id) {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('images', 'readwrite');
+      const store = tx.objectStore('images');
+      store.delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  // Custom cards
+  async saveCustomCard(card) {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('customCards', 'readwrite');
+      const store = tx.objectStore('customCards');
+      store.put(card);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+
+  async getAllCustomCards() {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('customCards', 'readonly');
+      const store = tx.objectStore('customCards');
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  },
+
+  async deleteCustomCard(id) {
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('customCards', 'readwrite');
+      const store = tx.objectStore('customCards');
+      store.delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+};
+
+
+// ===== GAME DATA =====
+
+const RARITIES = [
+  { id: 'common', name: 'Common', color: 'var(--rare-common)', weight: 40, valueMult: 1 },
+  { id: 'uncommon', name: 'Uncommon', color: 'var(--rare-uncommon)', weight: 25, valueMult: 2.5 },
+  { id: 'rare', name: 'Rare', color: 'var(--rare-rare)', weight: 15, valueMult: 6 },
+  { id: 'double', name: 'Double Rare', color: 'var(--rare-double)', weight: 8, valueMult: 12 },
+  { id: 'ultra', name: 'Ultra Rare', color: 'var(--rare-ultra)', weight: 5, valueMult: 25 },
+  { id: 'illustration', name: 'Illustration Rare', color: 'var(--rare-illustration)', weight: 3.5, valueMult: 45 },
+  { id: 'special', name: 'Special Illustration', color: 'var(--rare-special)', weight: 2, valueMult: 80 },
+  { id: 'hyper', name: 'Hyper Rare', color: 'var(--rare-hyper)', weight: 1, valueMult: 150 },
+  { id: 'secret', name: 'Secret Rare', color: 'var(--rare-secret)', weight: 0.5, valueMult: 300 }
+];
+
+const CARD_TYPES = ['Creature', 'Spell', 'Artifact', 'Landscape', 'Legend'];
+
+// Original fictional creatures for Aetherforge
+const BASE_CREATURES = [
+  { name: 'Emberfox', type: 'Creature', element: 'Fire' },
+  { name: 'Stormwyrm', type: 'Creature', element: 'Storm' },
+  { name: 'Crystalshade', type: 'Creature', element: 'Crystal' },
+  { name: 'Mossback Titan', type: 'Creature', element: 'Nature' },
+  { name: 'Voidstrider', type: 'Creature', element: 'Void' },
+  { name: 'Aetherwing', type: 'Creature', element: 'Aether' },
+  { name: 'Ironhowl', type: 'Creature', element: 'Metal' },
+  { name: 'Lunara', type: 'Creature', element: 'Moon' },
+  { name: 'Pyreheart', type: 'Creature', element: 'Fire' },
+  { name: 'Glacierfin', type: 'Creature', element: 'Ice' },
+  { name: 'Thornveil', type: 'Creature', element: 'Nature' },
+  { name: 'Shadowcoil', type: 'Creature', element: 'Shadow' },
+  { name: 'Solara', type: 'Creature', element: 'Light' },
+  { name: 'Riftwalker', type: 'Creature', element: 'Void' },
+  { name: 'Aquara', type: 'Creature', element: 'Water' },
+  { name: 'Duskborn', type: 'Creature', element: 'Shadow' },
+  { name: 'Starforge', type: 'Creature', element: 'Cosmic' },
+  { name: 'Blazewing', type: 'Creature', element: 'Fire' },
+  { name: 'Mirage', type: 'Creature', element: 'Illusion' },
+  { name: 'Obsidian Guard', type: 'Creature', element: 'Earth' },
+  { name: 'Frostbite', type: 'Creature', element: 'Ice' },
+  { name: 'Verdant King', type: 'Creature', element: 'Nature' },
+  { name: 'Eclipse Serpent', type: 'Creature', element: 'Cosmic' },
+  { name: 'Thunderclaw', type: 'Creature', element: 'Storm' },
+  { name: 'Phantom', type: 'Creature', element: 'Spirit' },
+  { name: 'Cinderlash', type: 'Spell', element: 'Fire' },
+  { name: 'Tidebind', type: 'Spell', element: 'Water' },
+  { name: 'Aether Pulse', type: 'Spell', element: 'Aether' },
+  { name: 'Void Collapse', type: 'Spell', element: 'Void' },
+  { name: 'Solar Flare', type: 'Spell', element: 'Light' },
+  { name: 'Ancient Relic', type: 'Artifact', element: 'Neutral' },
+  { name: 'Soul Crystal', type: 'Artifact', element: 'Spirit' },
+  { name: 'Forge Hammer', type: 'Artifact', element: 'Metal' },
+  { name: 'Shattered Peak', type: 'Landscape', element: 'Earth' },
+  { name: 'Eternal Grove', type: 'Landscape', element: 'Nature' },
+  { name: 'Abyssal Rift', type: 'Landscape', element: 'Void' },
+  { name: 'Celestial Throne', type: 'Legend', element: 'Cosmic' },
+  { name: 'First Ember', type: 'Legend', element: 'Fire' },
+  { name: 'The Weaver', type: 'Legend', element: 'Aether' },
+  { name: 'Night Sovereign', type: 'Legend', element: 'Shadow' }
+];
+
+const ARTWORK_STYLES = [
+  { id: 'normal', name: 'Normal' },
+  { id: 'reverse', name: 'Reverse Holo' },
+  { id: 'fullart', name: 'Full Art' },
+  { id: 'gold', name: 'Gold' },
+  { id: 'rainbow', name: 'Rainbow' },
+  { id: 'secret', name: 'Secret' },
+  { id: 'special', name: 'Special Artwork' },
+  { id: 'alt', name: 'Alternative Art' }
+];
+
+// Default packs
+const DEFAULT_PACKS = [
+  {
+    id: 'basic',
+    name: 'Basic Pack',
+    price: 100,
+    color: 'linear-gradient(145deg, #3a3a45, #1e1e26)',
+    accent: '#8a8a9a',
+    cards: 5,
+    guaranteed: ['common'],
+    rates: { common: 55, uncommon: 30, rare: 12, double: 2.5, ultra: 0.5 }
+  },
+  {
+    id: 'premium',
+    name: 'Premium Pack',
+    price: 250,
+    color: 'linear-gradient(145deg, #2a3a5a, #152030)',
+    accent: '#5a8aff',
+    cards: 5,
+    guaranteed: ['uncommon'],
+    rates: { common: 35, uncommon: 35, rare: 20, double: 7, ultra: 2.5, illustration: 0.5 }
+  },
+  {
+    id: 'gold',
+    name: 'Gold Pack',
+    price: 500,
+    color: 'linear-gradient(145deg, #5a4a20, #2a2208)',
+    accent: '#d4af37',
+    cards: 6,
+    guaranteed: ['rare'],
+    rates: { common: 20, uncommon: 30, rare: 30, double: 12, ultra: 5, illustration: 2.5, special: 0.5 }
+  },
+  {
+    id: 'ultra',
+    name: 'Ultra Pack',
+    price: 1000,
+    color: 'linear-gradient(145deg, #4a2a5a, #1e1028)',
+    accent: '#c070ff',
+    cards: 6,
+    guaranteed: ['double'],
+    rates: { uncommon: 15, rare: 30, double: 28, ultra: 15, illustration: 8, special: 3, hyper: 1 }
+  },
+  {
+    id: 'holo',
+    name: 'Holo Pack',
+    price: 1500,
+    color: 'linear-gradient(145deg, #2a4a4a, #0e2020)',
+    accent: '#40e0d0',
+    cards: 7,
+    guaranteed: ['ultra'],
+    rates: { rare: 20, double: 25, ultra: 30, illustration: 15, special: 7, hyper: 2.5, secret: 0.5 }
+  },
+  {
+    id: 'legendary',
+    name: 'Legendary Pack',
+    price: 2500,
+    color: 'linear-gradient(145deg, #5a2020, #2a0a0a)',
+    accent: '#ff5050',
+    cards: 7,
+    guaranteed: ['illustration'],
+    rates: { double: 15, ultra: 25, illustration: 30, special: 18, hyper: 9, secret: 3 }
+  },
+  {
+    id: 'mystery',
+    name: 'Mystery Pack',
+    price: 4000,
+    color: 'linear-gradient(145deg, #3a2a5a, #1a1030)',
+    accent: '#b060ff',
+    cards: 8,
+    guaranteed: ['special'],
+    rates: { ultra: 15, illustration: 25, special: 30, hyper: 20, secret: 10 }
+  },
+  {
+    id: 'ultimate',
+    name: 'Ultimate Pack',
+    price: 7500,
+    color: 'linear-gradient(145deg, #5a4a10, #2a2005)',
+    accent: '#ffd700',
+    cards: 10,
+    guaranteed: ['hyper'],
+    rates: { illustration: 15, special: 25, hyper: 35, secret: 25 }
+  }
+];
+
+// Generate base card pool
+function generateBaseCards() {
+  const cards = [];
+  let idCounter = 1000;
+
+  BASE_CREATURES.forEach((creature, idx) => {
+    // Each creature gets several rarity versions
+    const raritiesForCreature = RARITIES.slice(0, 6 + (idx % 4)); // vary
+    raritiesForCreature.forEach((rarity, rIdx) => {
+      const style = ARTWORK_STYLES[Math.min(rIdx, ARTWORK_STYLES.length - 1)];
+      const baseValue = 10 + idx * 3;
+      const value = Math.round(baseValue * rarity.valueMult * (0.8 + Math.random() * 0.4));
+
+      cards.push({
+        id: `card_${idCounter++}`,
+        name: creature.name + (rIdx > 2 ? ` ${style.name}` : ''),
+        pokemon: creature.name, // kept as "pokemon" key for compatibility with prompt
+        creature: creature.name,
+        type: creature.type,
+        element: creature.element,
+        rarity: rarity.id,
+        rarityName: rarity.name,
+        style: style.id,
+        styleName: style.name,
+        value,
+        description: `A powerful ${creature.element.toLowerCase()} ${creature.type.toLowerCase()} from the Aether realms.`,
+        isCustom: false,
+        isHolo: ['reverse', 'fullart', 'gold', 'rainbow', 'secret', 'special'].includes(style.id),
+        isGold: style.id === 'gold',
+        isRainbow: style.id === 'rainbow' || rarity.id === 'secret',
+        artwork: null // procedural for base cards
+      });
+    });
+  });
+
+  return cards;
+}
+
+const BASE_CARDS = generateBaseCards();
+
+// Daily tasks templates
+const TASK_TEMPLATES = [
+  { id: 'open_3', title: 'Öffne 3 Packs', target: 3, type: 'packsOpened', reward: 150 },
+  { id: 'open_5', title: 'Öffne 5 Packs', target: 5, type: 'packsOpened', reward: 300 },
+  { id: 'pull_rare', title: 'Ziehe 2 Rare oder besser', target: 2, type: 'rarePulls', reward: 200 },
+  { id: 'pull_holo', title: 'Ziehe 1 Holo-Karte', target: 1, type: 'holoPulls', reward: 250 },
+  { id: 'collect_10', title: 'Besitze 10 verschiedene Karten', target: 10, type: 'uniqueCards', reward: 180 },
+  { id: 'sell_3', title: 'Verkaufe 3 Karten', target: 3, type: 'cardsSold', reward: 120 },
+  { id: 'binder_page', title: 'Fülle eine Binder-Seite', target: 1, type: 'binderPages', reward: 400 }
+];
+
+
+// ===== VISUAL EFFECTS =====
+
+const Effects = {
+  // Apply 3D tilt + shine on mouse/touch move
+  enableCardTilt(cardEl) {
+    if (!cardEl) return;
+
+    const handleMove = (e) => {
+      const rect = cardEl.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -12;
+      const rotateY = ((x - centerX) / centerX) * 12;
+
+      cardEl.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+
+      const shine = cardEl.querySelector('.card-shine');
+      if (shine) {
+        const px = (x / rect.width) * 100;
+        const py = (y / rect.height) * 100;
+        shine.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.45) 0%, transparent 55%)`;
+        shine.style.opacity = '0.85';
+      }
+    };
+
+    const reset = () => {
+      cardEl.style.transform = '';
+      const shine = cardEl.querySelector('.card-shine');
+      if (shine) {
+        shine.style.opacity = cardEl.classList.contains('holo') ? '0.7' : '0';
+        shine.style.background = '';
+      }
+    };
+
+    cardEl.addEventListener('mousemove', handleMove);
+    cardEl.addEventListener('touchmove', handleMove, { passive: true });
+    cardEl.addEventListener('mouseleave', reset);
+    cardEl.addEventListener('touchend', reset);
+  },
+
+  // Create particle burst (glitter)
+  sparkle(x, y, color = '#d4af37', count = 18) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.style.cssText = `
+        position: fixed;
+        left: ${x}px;
+        top: ${y}px;
+        width: ${4 + Math.random() * 6}px;
+        height: ${4 + Math.random() * 6}px;
+        background: ${color};
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 999;
+        box-shadow: 0 0 8px ${color};
+      `;
+      document.body.appendChild(p);
+
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 80;
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist - 30;
+
+      p.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+      ], {
+        duration: 600 + Math.random() * 400,
+        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+      }).onfinish = () => p.remove();
+    }
+  },
+
+  // Simple confetti for rare pulls
+  confetti() {
+    const colors = ['#d4af37', '#f0d878', '#7b5cff', '#ff6b9d', '#40e0d0', '#fff'];
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement('div');
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      p.style.cssText = `
+        position: fixed;
+        left: ${20 + Math.random() * 60}vw;
+        top: -20px;
+        width: ${6 + Math.random() * 8}px;
+        height: ${6 + Math.random() * 10}px;
+        background: ${color};
+        border-radius: 2px;
+        pointer-events: none;
+        z-index: 998;
+        opacity: 0.9;
+      `;
+      document.body.appendChild(p);
+      const duration = 1500 + Math.random() * 1500;
+      p.animate([
+        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+        { transform: `translateY(100vh) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }
+      ], {
+        duration,
+        easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
+      }).onfinish = () => p.remove();
+    }
+  }
+};
+
+
+// ===== AETHERFORGE MAIN APPLICATION =====
+
+const App = {
+  state: {
+    coins: 5000,
+    collection: {},          // cardId -> count
+    favorites: [],
+    binders: [],
+    packs: [],
+    cards: [],               // all available cards (base + custom)
+    stats: {
+      packsOpened: 0,
+      cardsPulled: 0,
+      rarePulls: 0,
+      holoPulls: 0,
+      cardsSold: 0,
+      totalSpent: 0,
+      totalEarned: 0,
+      rarestPull: null,
+      binderPages: 0
+    },
+    tasks: [],
+    settings: {
+      sound: true,
+      animations: true,
+      skipAnim: false,
+      effects: true
+    },
+    recentPulls: [],
+    forceNext: null,         // admin force pull
+    infiniteCoins: false,
+    adminUnlocked: false
+  },
+
+  currentView: 'home',
+  openingInProgress: false,
+
+  async init() {
+    try {
+      await Storage.init();
+      this.loadState();
+      this.ensureBaseData();
+      await this.loadCustomCards();
+      this.setupDailyTasks();
+      this.bindEvents();
+      this.render();
+      document.getElementById('loading-screen').classList.remove('active');
+      document.getElementById('main-app').classList.add('active');
+      this.toast('Willkommen bei Aetherforge!', 'success');
+    } catch (e) {
+      console.error(e);
+      document.querySelector('.loader-sub').textContent = 'Fehler beim Laden';
+    }
+  },
+
+  ensureBaseData() {
+    if (!this.state.packs.length) {
+      this.state.packs = JSON.parse(JSON.stringify(DEFAULT_PACKS));
+    }
+    if (!this.state.cards.length) {
+      this.state.cards = [...BASE_CARDS];
+    }
+    if (!this.state.binders.length) {
+      this.state.binders = [
+        { id: 'main', name: 'Hauptsammlung', cover: '#1a1a22', pages: [Array(9).fill(null)] },
+        { id: 'legendary', name: 'Legendary Binder', cover: '#2a1520', pages: [Array(9).fill(null)] },
+        { id: 'gold', name: 'Goldkarten', cover: '#2a2210', pages: [Array(9).fill(null)] },
+        { id: 'holo', name: 'Holo-Sammlung', cover: '#152a2a', pages: [Array(9).fill(null)] }
+      ];
+    }
+  },
+
+  async loadCustomCards() {
+    try {
+      const customs = await Storage.getAllCustomCards();
+      // Merge custom cards into cards array (replace if same id)
+      customs.forEach(c => {
+        const idx = this.state.cards.findIndex(x => x.id === c.id);
+        if (idx >= 0) this.state.cards[idx] = c;
+        else this.state.cards.push(c);
+      });
+    } catch (e) {
+      console.warn('Could not load custom cards', e);
+    }
+  },
+
+  loadState() {
+    const saved = Storage.get('state');
+    if (saved) {
+      Object.assign(this.state, saved);
+      // Ensure required structures exist
+      if (!this.state.stats) this.state.stats = {};
+      if (!this.state.settings) this.state.settings = { sound: true, animations: true, skipAnim: false, effects: true };
+      if (!this.state.collection) this.state.collection = {};
+      if (!this.state.recentPulls) this.state.recentPulls = [];
+    }
+  },
+
+  saveState() {
+    // Don't save full cards array every time (too big) – custom cards are in IndexedDB
+    const toSave = {
+      coins: this.state.coins,
+      collection: this.state.collection,
+      favorites: this.state.favorites,
+      binders: this.state.binders,
+      packs: this.state.packs,
+      stats: this.state.stats,
+      tasks: this.state.tasks,
+      settings: this.state.settings,
+      recentPulls: this.state.recentPulls.slice(0, 20),
+      forceNext: this.state.forceNext,
+      infiniteCoins: this.state.infiniteCoins,
+      adminUnlocked: this.state.adminUnlocked
+    };
+    Storage.set('state', toSave);
+  },
+
+  // ===== NAVIGATION =====
+  navigate(view) {
+    this.currentView = view;
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === view);
+    });
+    this.render();
+  },
+
+  bindEvents() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => this.navigate(btn.dataset.view));
+    });
+
+    document.getElementById('btn-settings').addEventListener('click', () => {
+      this.navigate('settings');
+    });
+
+    document.getElementById('close-card-modal').addEventListener('click', () => {
+      document.getElementById('card-modal').classList.remove('active');
+    });
+
+    document.getElementById('cancel-admin-login').addEventListener('click', () => {
+      document.getElementById('admin-login-modal').classList.remove('active');
+    });
+
+    document.getElementById('confirm-admin-login').addEventListener('click', () => {
+      const pw = document.getElementById('admin-password').value;
+      if (pw === 'aether2026') {
+        this.state.adminUnlocked = true;
+        this.saveState();
+        document.getElementById('admin-login-modal').classList.remove('active');
+        this.navigate('admin');
+        this.toast('Admin-Modus aktiviert', 'success');
+      } else {
+        this.toast('Falsches Passwort', 'error');
+      }
+    });
+
+    document.getElementById('btn-skip-anim').addEventListener('click', () => {
+      if (this.openingInProgress) this.finishOpening(true);
+    });
+
+    document.getElementById('btn-continue-opening').addEventListener('click', () => {
+      document.getElementById('opening-overlay').classList.remove('active');
+      this.openingInProgress = false;
+      this.render();
+    });
+  },
+
+  // ===== RENDERING =====
+  render() {
+    this.updateCoins();
+    const content = document.getElementById('content');
+    switch (this.currentView) {
+      case 'home': content.innerHTML = this.renderHome(); break;
+      case 'shop': content.innerHTML = this.renderShop(); break;
+      case 'collection': content.innerHTML = this.renderCollection(); break;
+      case 'binder': content.innerHTML = this.renderBinder(); break;
+      case 'market': content.innerHTML = this.renderMarket(); break;
+      case 'stats': content.innerHTML = this.renderStats(); break;
+      case 'tasks': content.innerHTML = this.renderTasks(); break;
+      case 'settings': content.innerHTML = this.renderSettings(); break;
+      case 'admin': content.innerHTML = this.renderAdmin(); break;
+      default: content.innerHTML = this.renderHome();
+    }
+    this.attachViewEvents();
+  },
+
+  updateCoins() {
+    const el = document.getElementById('coin-amount');
+    if (el) el.textContent = this.formatNumber(this.state.coins);
+  },
+
+  formatNumber(n) {
+    return n.toLocaleString('de-DE');
+  },
+
+  getCard(id) {
+    return this.state.cards.find(c => c.id === id);
+  },
+
+  getOwnedCount(id) {
+    return this.state.collection[id] || 0;
+  },
+
+  getUniqueCount() {
+    return Object.keys(this.state.collection).filter(id => this.state.collection[id] > 0).length;
+  },
+
+  getTotalCards() {
+    return Object.values(this.state.collection).reduce((a, b) => a + b, 0);
+  },
+
+  getCollectionValue() {
+    let total = 0;
+    for (const [id, count] of Object.entries(this.state.collection)) {
+      const card = this.getCard(id);
+      if (card) total += card.value * count;
+    }
+    return total;
+  },
+
+  // ===== HOME =====
+  renderHome() {
+    const unique = this.getUniqueCount();
+    const totalPossible = this.state.cards.length;
+    const progress = totalPossible ? Math.min(100, (unique / totalPossible) * 100) : 0;
+    const recent = this.state.recentPulls.slice(0, 8);
+
+    return `
+      <div class="home-header">
+        <div class="welcome-text">Willkommen, Sammler</div>
+        <div style="color:var(--text-dim);font-size:13px;">Dein Aetherforge-Reich</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-value">${this.formatNumber(this.state.coins)}</div>
+          <div class="stat-label">Coins</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${this.getTotalCards()}</div>
+          <div class="stat-label">Karten</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${unique}</div>
+          <div class="stat-label">Einzigartig</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span>Sammlungsfortschritt</span>
+          <span>${unique} / ${totalPossible}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${progress}%"></div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:20px">Letzte Pulls</div>
+      ${recent.length ? `
+        <div class="recent-pulls">
+          ${recent.map(id => this.renderMiniCard(id)).join('')}
+        </div>
+      ` : `<div class="empty-state"><div class="icon">✦</div>Noch keine Karten gezogen</div>`}
+
+      <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="App.navigate('shop')">Packs öffnen</button>
+        <button class="btn-secondary" onclick="App.navigate('tasks')">Aufgaben</button>
+        <button class="btn-secondary" onclick="App.openAdminLogin()">Admin</button>
+      </div>
+    `;
+  },
+
+  renderMiniCard(cardId) {
+    const card = this.getCard(cardId);
+    if (!card) return '';
+    return `<div class="tcg-card ${card.isHolo ? 'holo' : ''} ${card.isGold ? 'gold-border' : ''} ${card.isRainbow ? 'rainbow-border' : ''}" 
+      style="width:90px" onclick="App.showCardDetail('${card.id}')">
+      <div class="card-bg" style="background:${this.getCardBackground(card)}"></div>
+      <div class="card-shine"></div>
+      <div class="card-rarity rarity-${card.rarity}">${card.rarityName.substring(0, 3)}</div>
+      <div class="card-name">${card.name}</div>
+    </div>`;
+  },
+
+  getCardBackground(card) {
+    if (card.artwork) return `url(${card.artwork}) center/cover`;
+    // Procedural colors based on element / rarity
+    const elementColors = {
+      Fire: 'linear-gradient(145deg, #5a2020, #2a0a0a)',
+      Storm: 'linear-gradient(145deg, #203a5a, #0a1a2a)',
+      Crystal: 'linear-gradient(145deg, #3a2a5a, #1a1030)',
+      Nature: 'linear-gradient(145deg, #1a3a2a, #0a1a10)',
+      Void: 'linear-gradient(145deg, #1a1a2a, #0a0a14)',
+      Aether: 'linear-gradient(145deg, #2a2a4a, #101028)',
+      Metal: 'linear-gradient(145deg, #3a3a40, #1a1a1e)',
+      Moon: 'linear-gradient(145deg, #2a2a3a, #12121c)',
+      Ice: 'linear-gradient(145deg, #1a3a4a, #0a1a24)',
+      Shadow: 'linear-gradient(145deg, #1a1020, #0a0610)',
+      Light: 'linear-gradient(145deg, #4a4a2a, #2a2a10)',
+      Cosmic: 'linear-gradient(145deg, #2a1a4a, #120a24)',
+      Water: 'linear-gradient(145deg, #1a2a4a, #0a1424)',
+      Earth: 'linear-gradient(145deg, #3a2a1a, #1a1008)',
+      Spirit: 'linear-gradient(145deg, #2a3a3a, #101a1a)',
+      Illusion: 'linear-gradient(145deg, #3a2a4a, #1a1024)',
+      Neutral: 'linear-gradient(145deg, #2a2a2a, #141414)'
+    };
+    return elementColors[card.element] || elementColors.Neutral;
+  },
+
+  // ===== SHOP =====
+  renderShop() {
+    return `
+      <div class="section-title">Booster Shop</div>
+      <div class="shop-grid">
+        ${this.state.packs.filter(p => !p.disabled).map(pack => `
+          <div class="pack-card" onclick="App.buyPack('${pack.id}')">
+            <div class="pack-visual-preview" style="background:${pack.color}">
+              <span style="font-family:Orbitron;font-size:13px;letter-spacing:1px;z-index:1;position:relative">${pack.name}</span>
+            </div>
+            <div class="pack-info">
+              <div class="pack-name">${pack.name}</div>
+              <div class="pack-price"><span class="coin-icon">◉</span> ${this.formatNumber(pack.price)}</div>
+              <div class="pack-rarity-hint">${pack.cards} Karten · ${pack.guaranteed[0] || 'mixed'}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  },
+
+  buyPack(packId) {
+    const pack = this.state.packs.find(p => p.id === packId);
+    if (!pack) return;
+
+    if (!this.state.infiniteCoins && this.state.coins < pack.price) {
+      this.toast('Nicht genug Coins!', 'error');
+      return;
+    }
+
+    if (!this.state.infiniteCoins) {
+      this.state.coins -= pack.price;
+      this.state.stats.totalSpent = (this.state.stats.totalSpent || 0) + pack.price;
+    }
+
+    this.updateCoins();
+    this.startOpening(pack);
+  },
+
+  // ===== PACK OPENING =====
+  startOpening(pack) {
+    this.openingInProgress = true;
+    const overlay = document.getElementById('opening-overlay');
+    const packVis = document.getElementById('pack-visual');
+    const cardsReveal = document.getElementById('cards-reveal');
+    const btnSkip = document.getElementById('btn-skip-anim');
+    const btnContinue = document.getElementById('btn-continue-opening');
+
+    cardsReveal.innerHTML = '';
+    btnContinue.classList.add('hidden');
+    btnSkip.classList.remove('hidden');
+
+    packVis.style.background = pack.color;
+    packVis.style.border = `2px solid ${pack.accent}`;
+    packVis.textContent = pack.name;
+    packVis.className = 'pack-visual';
+    packVis.style.opacity = '1';
+    packVis.style.transform = '';
+
+    overlay.classList.add('active');
+
+    // Generate cards first
+    this.pendingCards = this.generatePull(pack);
+
+    if (this.state.settings.skipAnim) {
+      this.finishOpening(true);
+      return;
+    }
+
+    // Animation sequence
+    setTimeout(() => {
+      packVis.classList.add('shake');
+      if (this.state.settings.effects) {
+        Effects.sparkle(window.innerWidth / 2, window.innerHeight / 2 - 40, pack.accent, 12);
+      }
+    }, 400);
+
+    setTimeout(() => {
+      packVis.classList.add('opened');
+      this.revealCardsOneByOne();
+    }, 1100);
+  },
+
+  generatePull(pack) {
+    const results = [];
+    const rates = pack.rates || {};
+
+    // Guarantee
+    if (pack.guaranteed && pack.guaranteed.length) {
+      pack.guaranteed.forEach(r => {
+        results.push(this.pickCardOfRarity(r));
+      });
+    }
+
+    // Fill remaining
+    const remaining = pack.cards - results.length;
+    for (let i = 0; i < remaining; i++) {
+      if (this.state.forceNext) {
+        const forced = this.getCard(this.state.forceNext) || this.pickCardOfRarity(this.state.forceNext);
+        results.push(forced);
+        this.state.forceNext = null;
+      } else {
+        const rarity = this.rollRarity(rates);
+        results.push(this.pickCardOfRarity(rarity));
+      }
+    }
+
+    return results.filter(Boolean);
+  },
+
+  rollRarity(rates) {
+    const entries = Object.entries(rates);
+    const total = entries.reduce((s, [, w]) => s + w, 0);
+    let r = Math.random() * total;
+    for (const [rarity, weight] of entries) {
+      r -= weight;
+      if (r <= 0) return rarity;
+    }
+    return entries[0][0];
+  },
+
+  pickCardOfRarity(rarityId) {
+    // If forceNext is a card id
+    if (typeof rarityId === 'string' && rarityId.startsWith('card_')) {
+      return this.getCard(rarityId);
+    }
+    const pool = this.state.cards.filter(c => c.rarity === rarityId);
+    if (!pool.length) {
+      // fallback
+      const all = this.state.cards;
+      return all[Math.floor(Math.random() * all.length)];
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
+  },
+
+  revealCardsOneByOne() {
+    const container = document.getElementById('cards-reveal');
+    const cards = this.pendingCards;
+    let i = 0;
+
+    const showNext = () => {
+      if (i >= cards.length) {
+        this.finishOpening(false);
+        return;
+      }
+      const card = cards[i];
+      const el = document.createElement('div');
+      el.className = `tcg-card ${card.isHolo ? 'holo' : ''} ${card.isGold ? 'gold-border' : ''} ${card.isRainbow ? 'rainbow-border' : ''}`;
+      el.innerHTML = `
+        <div class="card-bg" style="background:${this.getCardBackground(card)}"></div>
+        <div class="card-shine"></div>
+        <div class="card-rarity rarity-${card.rarity}">${card.rarityName}</div>
+        <div class="card-name">${card.name}</div>
+      `;
+      el.onclick = () => this.showCardDetail(card.id);
+      container.appendChild(el);
+
+      requestAnimationFrame(() => {
+        el.classList.add('revealed');
+        if (['ultra', 'illustration', 'special', 'hyper', 'secret'].includes(card.rarity)) {
+          el.classList.add('special-reveal');
+          if (this.state.settings.effects) {
+            Effects.sparkle(el.getBoundingClientRect().left + 55, el.getBoundingClientRect().top + 70, '#d4af37', 20);
+            if (['hyper', 'secret'].includes(card.rarity)) Effects.confetti();
+          }
+        }
+      });
+
+      i++;
+      setTimeout(showNext, this.state.settings.animations ? 380 : 80);
+    };
+
+    showNext();
+  },
+
+  finishOpening(skip) {
+    const cards = this.pendingCards || [];
+    // Add to collection
+    cards.forEach(card => {
+      this.state.collection[card.id] = (this.state.collection[card.id] || 0) + 1;
+      this.state.recentPulls.unshift(card.id);
+      this.state.stats.cardsPulled = (this.state.stats.cardsPulled || 0) + 1;
+
+      if (['rare', 'double', 'ultra', 'illustration', 'special', 'hyper', 'secret'].includes(card.rarity)) {
+        this.state.stats.rarePulls = (this.state.stats.rarePulls || 0) + 1;
+      }
+      if (card.isHolo) {
+        this.state.stats.holoPulls = (this.state.stats.holoPulls || 0) + 1;
+      }
+
+      // Track rarest
+      const order = RARITIES.map(r => r.id);
+      if (!this.state.stats.rarestPull || order.indexOf(card.rarity) > order.indexOf(this.getCard(this.state.stats.rarestPull)?.rarity || 'common')) {
+        this.state.stats.rarestPull = card.id;
+      }
+    });
+
+    this.state.stats.packsOpened = (this.state.stats.packsOpened || 0) + 1;
+    this.state.recentPulls = this.state.recentPulls.slice(0, 30);
+    this.updateTasks();
+    this.saveState();
+
+    if (skip) {
+      // Instant show all
+      const container = document.getElementById('cards-reveal');
+      container.innerHTML = '';
+      cards.forEach(card => {
+        const el = document.createElement('div');
+        el.className = `tcg-card revealed ${card.isHolo ? 'holo' : ''} ${card.isGold ? 'gold-border' : ''} ${card.isRainbow ? 'rainbow-border' : ''}`;
+        el.innerHTML = `
+          <div class="card-bg" style="background:${this.getCardBackground(card)}"></div>
+          <div class="card-shine"></div>
+          <div class="card-rarity rarity-${card.rarity}">${card.rarityName}</div>
+          <div class="card-name">${card.name}</div>
+        `;
+        el.onclick = () => this.showCardDetail(card.id);
+        container.appendChild(el);
+      });
+      document.getElementById('pack-visual').classList.add('opened');
+    }
+
+    document.getElementById('btn-skip-anim').classList.add('hidden');
+    document.getElementById('btn-continue-opening').classList.remove('hidden');
+    this.toast(`${cards.length} Karten erhalten!`, 'success');
+  },
+
+  // ===== COLLECTION =====
+  renderCollection() {
+    const ownedIds = Object.keys(this.state.collection).filter(id => this.state.collection[id] > 0);
+    const filter = this._collectionFilter || 'all';
+    const search = (this._collectionSearch || '').toLowerCase();
+
+    let list = ownedIds.map(id => this.getCard(id)).filter(Boolean);
+    if (filter !== 'all') list = list.filter(c => c.rarity === filter);
+    if (search) list = list.filter(c => c.name.toLowerCase().includes(search) || (c.creature || '').toLowerCase().includes(search));
+
+    list.sort((a, b) => b.value - a.value);
+
+    return `
+      <div class="section-title">Meine Sammlung (${ownedIds.length})</div>
+      <input class="search-input" type="search" placeholder="Karte suchen..." value="${this._collectionSearch || ''}" 
+        oninput="App._collectionSearch=this.value;App.render()" />
+      <div class="filter-bar">
+        <div class="filter-chip ${filter==='all'?'active':''}" onclick="App._collectionFilter='all';App.render()">Alle</div>
+        ${RARITIES.map(r => `
+          <div class="filter-chip ${filter===r.id?'active':''}" onclick="App._collectionFilter='${r.id}';App.render()">${r.name}</div>
+        `).join('')}
+      </div>
+      ${list.length ? `
+        <div class="card-grid">
+          ${list.map(card => `
+            <div style="position:relative">
+              ${this.renderMiniCard(card.id)}
+              <div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:4px">×${this.getOwnedCount(card.id)}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : `<div class="empty-state"><div class="icon">▤</div>Keine Karten in diesem Filter</div>`}
+    `;
+  },
+
+  // ===== BINDER =====
+  renderBinder() {
+    const binderId = this._currentBinder || 'main';
+    const binder = this.state.binders.find(b => b.id === binderId) || this.state.binders[0];
+    const pageIdx = this._binderPage || 0;
+    const page = binder.pages[pageIdx] || Array(9).fill(null);
+
+    return `
+      <div class="section-title">Binder</div>
+      <div class="binder-tabs">
+        ${this.state.binders.map(b => `
+          <div class="filter-chip ${b.id===binderId?'active':''}" onclick="App._currentBinder='${b.id}';App._binderPage=0;App.render()">${b.name}</div>
+        `).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <button class="btn-secondary" style="padding:6px 12px" onclick="App.changeBinderPage(-1)" ${pageIdx<=0?'disabled':''}>←</button>
+        <span style="font-size:13px;color:var(--text-dim)">Seite ${pageIdx+1} / ${binder.pages.length}</span>
+        <button class="btn-secondary" style="padding:6px 12px" onclick="App.changeBinderPage(1)">→</button>
+      </div>
+      <div class="binder-page">
+        <div class="binder-grid">
+          ${page.map((slot, i) => `
+            <div class="binder-slot ${slot?'filled':''}" onclick="App.binderSlotClick('${binderId}',${pageIdx},${i})">
+              ${slot ? this.renderMiniCard(slot) : '<span style="color:var(--text-muted);font-size:20px">+</span>'}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+        Tippe auf einen leeren Slot und wähle danach eine Karte aus der Sammlung.
+      </div>
+    `;
+  },
+
+  changeBinderPage(dir) {
+    const binder = this.state.binders.find(b => b.id === (this._currentBinder || 'main'));
+    if (!binder) return;
+    let page = (this._binderPage || 0) + dir;
+    if (page < 0) return;
+    if (page >= binder.pages.length) {
+      binder.pages.push(Array(9).fill(null));
+    }
+    this._binderPage = page;
+    this.saveState();
+    this.render();
+  },
+
+  binderSlotClick(binderId, pageIdx, slotIdx) {
+    const binder = this.state.binders.find(b => b.id === binderId);
+    if (!binder) return;
+    const current = binder.pages[pageIdx][slotIdx];
+
+    if (current) {
+      // Remove
+      binder.pages[pageIdx][slotIdx] = null;
+      this.saveState();
+      this.render();
+      this.toast('Karte aus Binder entfernt');
+      return;
+    }
+
+    // Choose card
+    const owned = Object.keys(this.state.collection).filter(id => this.state.collection[id] > 0);
+    if (!owned.length) {
+      this.toast('Keine Karten in der Sammlung', 'error');
+      return;
+    }
+
+    // Simple picker via prompt for now (can be improved later)
+    const names = owned.map(id => {
+      const c = this.getCard(id);
+      return c ? `${c.name} (${c.rarityName})` : id;
+    });
+    const choice = prompt('Karten-ID eingeben oder Index (0-' + (owned.length-1) + '):\n' + names.slice(0,15).join('\n') + (names.length>15?'\n...':''));
+    if (choice === null) return;
+
+    let cardId = choice;
+    if (!isNaN(parseInt(choice))) {
+      cardId = owned[parseInt(choice)];
+    }
+    if (!this.getCard(cardId) || !this.state.collection[cardId]) {
+      this.toast('Ungültige Karte', 'error');
+      return;
+    }
+
+    binder.pages[pageIdx][slotIdx] = cardId;
+    // Check full page
+    if (binder.pages[pageIdx].every(s => s)) {
+      this.state.stats.binderPages = (this.state.stats.binderPages || 0) + 1;
+      this.updateTasks();
+      this.toast('Binder-Seite vervollständigt! +Aufgabe', 'success');
+    }
+    this.saveState();
+    this.render();
+  },
+
+  // ===== MARKET =====
+  renderMarket() {
+    const owned = Object.entries(this.state.collection)
+      .filter(([, count]) => count > 0)
+      .map(([id, count]) => ({ card: this.getCard(id), count }))
+      .filter(x => x.card)
+      .sort((a, b) => b.card.value - a.card.value);
+
+    return `
+      <div class="section-title">Kartenmarkt</div>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:14px">Verkaufe doppelte oder ungewollte Karten für Coins.</p>
+      ${owned.length ? owned.map(({ card, count }) => `
+        <div class="market-item">
+          <div class="tcg-card ${card.isHolo?'holo':''}" style="width:56px" onclick="App.showCardDetail('${card.id}')">
+            <div class="card-bg" style="background:${this.getCardBackground(card)}"></div>
+            <div class="card-shine"></div>
+          </div>
+          <div class="market-info">
+            <div class="market-name">${card.name}</div>
+            <div class="market-meta">${card.rarityName} · ×${count}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="market-price">◉ ${this.formatNumber(card.value)}</div>
+            <button class="btn-secondary" style="padding:5px 10px;font-size:11px;margin-top:4px" 
+              onclick="App.sellCard('${card.id}')">Verkaufen</button>
+          </div>
+        </div>
+      `).join('') : `<div class="empty-state"><div class="icon">⇄</div>Keine Karten zum Verkaufen</div>`}
+    `;
+  },
+
+  sellCard(cardId) {
+    const count = this.state.collection[cardId] || 0;
+    if (count < 1) return;
+    const card = this.getCard(cardId);
+    if (!card) return;
+
+    this.state.collection[cardId] = count - 1;
+    if (this.state.collection[cardId] <= 0) delete this.state.collection[cardId];
+
+    this.state.coins += card.value;
+    this.state.stats.cardsSold = (this.state.stats.cardsSold || 0) + 1;
+    this.state.stats.totalEarned = (this.state.stats.totalEarned || 0) + card.value;
+    this.updateTasks();
+    this.saveState();
+    this.updateCoins();
+    this.render();
+    this.toast(`+${this.formatNumber(card.value)} Coins`, 'success');
+  },
+
+  // ===== STATS =====
+  renderStats() {
+    const s = this.state.stats;
+    const rarest = s.rarestPull ? this.getCard(s.rarestPull) : null;
+    return `
+      <div class="section-title">Statistiken</div>
+      <div class="stats-grid">
+        <div class="stats-card"><div class="label">Packs geöffnet</div><div class="value">${s.packsOpened||0}</div></div>
+        <div class="stats-card"><div class="label">Karten gezogen</div><div class="value">${s.cardsPulled||0}</div></div>
+        <div class="stats-card"><div class="label">Rare+ Pulls</div><div class="value">${s.rarePulls||0}</div></div>
+        <div class="stats-card"><div class="label">Holo Pulls</div><div class="value">${s.holoPulls||0}</div></div>
+        <div class="stats-card"><div class="label">Karten verkauft</div><div class="value">${s.cardsSold||0}</div></div>
+        <div class="stats-card"><div class="label">Gesamtwert</div><div class="value">${this.formatNumber(this.getCollectionValue())}</div></div>
+        <div class="stats-card"><div class="label">Einzigartige</div><div class="value">${this.getUniqueCount()}</div></div>
+        <div class="stats-card"><div class="label">Binder-Seiten</div><div class="value">${s.binderPages||0}</div></div>
+      </div>
+      ${rarest ? `
+        <div class="section-title" style="margin-top:20px">Seltenster Pull</div>
+        <div style="display:flex;justify-content:center;margin-top:10px">
+          ${this.renderMiniCard(rarest.id)}
+        </div>
+        <div style="text-align:center;margin-top:8px;font-size:13px">${rarest.name} · ${rarest.rarityName}</div>
+      ` : ''}
+    `;
+  },
+
+  // ===== TASKS =====
+  setupDailyTasks() {
+    const today = new Date().toDateString();
+    if (this.state.tasks.length && this.state.tasks[0].date === today) return;
+
+    // Pick 4 random tasks
+    const shuffled = [...TASK_TEMPLATES].sort(() => Math.random() - 0.5).slice(0, 4);
+    this.state.tasks = shuffled.map(t => ({
+      ...t,
+      date: today,
+      progress: 0,
+      claimed: false
+    }));
+    this.saveState();
+  },
+
+  updateTasks() {
+    const s = this.state.stats;
+    this.state.tasks.forEach(task => {
+      if (task.claimed) return;
+      let val = 0;
+      switch (task.type) {
+        case 'packsOpened': val = s.packsOpened || 0; break;
+        case 'rarePulls': val = s.rarePulls || 0; break;
+        case 'holoPulls': val = s.holoPulls || 0; break;
+        case 'uniqueCards': val = this.getUniqueCount(); break;
+        case 'cardsSold': val = s.cardsSold || 0; break;
+        case 'binderPages': val = s.binderPages || 0; break;
+      }
+      // For daily we track session progress differently – simplified: use absolute for now
+      task.progress = Math.min(task.target, val);
+    });
+    this.saveState();
+  },
+
+  claimTask(taskId) {
+    const task = this.state.tasks.find(t => t.id === taskId);
+    if (!task || task.claimed || task.progress < task.target) return;
+    task.claimed = true;
+    this.state.coins += task.reward;
+    this.state.stats.totalEarned = (this.state.stats.totalEarned || 0) + task.reward;
+    this.saveState();
+    this.updateCoins();
+    this.render();
+    this.toast(`+${task.reward} Coins erhalten!`, 'success');
+  },
+
+  renderTasks() {
+    this.updateTasks();
+    return `
+      <div class="section-title">Tägliche Aufgaben</div>
+      ${this.state.tasks.map(task => `
+        <div class="task-item ${task.claimed?'completed':''}">
+          <div class="task-info">
+            <div class="task-title">${task.title}</div>
+            <div class="task-progress">${Math.min(task.progress, task.target)} / ${task.target}</div>
+          </div>
+          <div class="task-reward">+${task.reward}</div>
+          ${!task.claimed && task.progress >= task.target ? 
+            `<button class="btn-primary" style="padding:6px 12px;font-size:12px" onclick="App.claimTask('${task.id}')">Abholen</button>` : 
+            task.claimed ? '<span style="color:var(--success);font-size:12px">✓</span>' : ''}
+        </div>
+      `).join('')}
+      <div style="margin-top:20px">
+        <button class="btn-secondary" onclick="App.navigate('home')">Zurück</button>
+      </div>
+    `;
+  },
+
+  // ===== SETTINGS =====
+  renderSettings() {
+    const s = this.state.settings;
+    return `
+      <div class="section-title">Einstellungen</div>
+      <div class="settings-group">
+        <div class="settings-item">
+          <label>Animationen</label>
+          <div class="toggle ${s.animations?'on':''}" onclick="App.toggleSetting('animations')"></div>
+        </div>
+        <div class="settings-item">
+          <label>Animationen überspringen</label>
+          <div class="toggle ${s.skipAnim?'on':''}" onclick="App.toggleSetting('skipAnim')"></div>
+        </div>
+        <div class="settings-item">
+          <label>Grafikeffekte (Glitzer etc.)</label>
+          <div class="toggle ${s.effects?'on':''}" onclick="App.toggleSetting('effects')"></div>
+        </div>
+        <div class="settings-item">
+          <label>Sound (Platzhalter)</label>
+          <div class="toggle ${s.sound?'on':''}" onclick="App.toggleSetting('sound')"></div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-item">
+          <label>Admin-Panel öffnen</label>
+          <button class="btn-secondary" style="padding:6px 14px" onclick="App.openAdminLogin()">Admin</button>
+        </div>
+        <div class="settings-item">
+          <label>Spielstand zurücksetzen</label>
+          <button class="btn-danger" onclick="App.resetGame()">Zurücksetzen</button>
+        </div>
+      </div>
+      <div style="margin-top:20px;font-size:12px;color:var(--text-muted);text-align:center">
+        Aetherforge v1.0 · Original TCG Simulator<br>
+        Alle Kreaturen und Designs sind fiktiv.
+      </div>
+    `;
+  },
+
+  toggleSetting(key) {
+    this.state.settings[key] = !this.state.settings[key];
+    this.saveState();
+    this.render();
+  },
+
+  resetGame() {
+    if (!confirm('Wirklich den gesamten Spielstand löschen? Dies kann nicht rückgängig gemacht werden.')) return;
+    localStorage.removeItem('aether_state');
+    location.reload();
+  },
+
+  openAdminLogin() {
+    if (this.state.adminUnlocked) {
+      this.navigate('admin');
+      return;
+    }
+    document.getElementById('admin-password').value = '';
+    document.getElementById('admin-login-modal').classList.add('active');
+  },
+
+  // ===== CARD DETAIL =====
+  showCardDetail(cardId) {
+    const card = this.getCard(cardId);
+    if (!card) return;
+    const count = this.getOwnedCount(cardId);
+    const content = document.getElementById('card-detail-content');
+    content.innerHTML = `
+      <div style="display:flex;justify-content:center;margin-bottom:16px">
+        <div class="tcg-card ${card.isHolo?'holo':''} ${card.isGold?'gold-border':''} ${card.isRainbow?'rainbow-border':''}" style="width:180px" id="detail-card">
+          <div class="card-bg" style="background:${this.getCardBackground(card)}"></div>
+          <div class="card-shine"></div>
+          <div class="card-rarity rarity-${card.rarity}">${card.rarityName}</div>
+          <div class="card-name">${card.name}</div>
+        </div>
+      </div>
+      <h3 style="text-align:center;margin-bottom:4px">${card.name}</h3>
+      <div style="text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:12px">
+        ${card.creature || card.pokemon} · ${card.type} · ${card.element || ''}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
+        <div><span style="color:var(--text-muted)">Seltenheit</span><br><strong>${card.rarityName}</strong></div>
+        <div><span style="color:var(--text-muted)">Wert</span><br><strong style="color:var(--gold)">◉ ${this.formatNumber(card.value)}</strong></div>
+        <div><span style="color:var(--text-muted)">Besitz</span><br><strong>×${count}</strong></div>
+        <div><span style="color:var(--text-muted)">Style</span><br><strong>${card.styleName || card.style}</strong></div>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:var(--text-dim)">${card.description || ''}</p>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        ${count > 0 ? `<button class="btn-secondary" onclick="App.sellCard('${card.id}');document.getElementById('card-modal').classList.remove('active')">Verkaufen</button>` : ''}
+        <button class="btn-secondary" onclick="document.getElementById('card-modal').classList.remove('active')">Schließen</button>
+      </div>
+    `;
+    document.getElementById('card-modal').classList.add('active');
+    setTimeout(() => {
+      const el = document.getElementById('detail-card');
+      if (el && this.state.settings.effects) Effects.enableCardTilt(el);
+    }, 50);
+  },
+
+  // ===== TOAST =====
+  toast(msg, type = '') {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.3s';
+      setTimeout(() => el.remove(), 300);
+    }, 2600);
+  },
+
+  attachViewEvents() {
+    // Re-attach tilt to visible cards if needed
+    if (this.state.settings.effects) {
+      document.querySelectorAll('.tcg-card').forEach(el => {
+        Effects.enableCardTilt(el);
+      });
+    }
+  }
+};
+
+// Boot
+document.addEventListener('DOMContentLoaded', () => App.init());
+
+
+// ===== ADMIN PANEL =====
+
+App.renderAdmin = function() {
+  if (!this.state.adminUnlocked) {
+    this.openAdminLogin();
+    return '<div class="empty-state">Admin-Login erforderlich</div>';
+  }
+
+  return `
+    <div class="admin-panel">
+      <div class="section-title">Admin Control Panel</div>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px">Vollständige Kontrolle über das Spiel. Änderungen werden sofort gespeichert.</p>
+
+      <!-- GELD -->
+      <div class="admin-section open" id="admin-money">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">◉ Geldverwaltung</div>
+        <div class="admin-section-body">
+          <div class="form-row">
+            <label>Coins hinzufügen / entfernen</label>
+            <input type="number" id="admin-coin-amount" placeholder="Betrag (negativ = entfernen)" />
+          </div>
+          <div class="admin-actions">
+            <button class="quick-btn gold" onclick="App.adminAddCoins()">Anwenden</button>
+            <button class="quick-btn" onclick="App.adminSetCoins(5000)">Auf 5.000 setzen</button>
+            <button class="quick-btn" onclick="App.adminSetCoins(999999)">999.999 Coins</button>
+            <button class="quick-btn ${this.state.infiniteCoins?'gold':''}" onclick="App.adminToggleInfinite()">
+              ${this.state.infiniteCoins ? '∞ Coins AN' : '∞ Coins AUS'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEUE KARTE -->
+      <div class="admin-section" id="admin-create-card">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">✦ Neue Karte erstellen</div>
+        <div class="admin-section-body">
+          <div class="form-row"><label>Kartenname</label><input id="ac-name" placeholder="z.B. Shadow Phoenix" /></div>
+          <div class="form-row"><label>Kreatur / Pokémon-Name</label><input id="ac-creature" placeholder="Name der Kreatur" /></div>
+          <div class="form-row"><label>Karten-ID (optional, sonst auto)</label><input id="ac-id" placeholder="card_custom_xxx" /></div>
+          <div class="form-row">
+            <label>Seltenheit</label>
+            <select id="ac-rarity">
+              ${RARITIES.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Typ</label>
+            <select id="ac-type">
+              ${CARD_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row"><label>Element</label><input id="ac-element" placeholder="Fire, Void, Cosmic..." value="Aether" /></div>
+          <div class="form-row"><label>Kartenwert (Coins)</label><input type="number" id="ac-value" value="100" /></div>
+          <div class="form-row"><label>Beschreibung</label><textarea id="ac-desc" placeholder="Kurzbeschreibung..."></textarea></div>
+          <div class="form-row">
+            <label>Style / Artwork-Typ</label>
+            <select id="ac-style">
+              ${ARTWORK_STYLES.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Artwork hochladen (Bild)</label>
+            <input type="file" id="ac-artwork" accept="image/*" />
+          </div>
+          <div class="form-row">
+            <label>Nach Erstellung:</label>
+            <select id="ac-action">
+              <option value="db">Nur in Datenbank speichern</option>
+              <option value="collection">Direkt meiner Sammlung hinzufügen</option>
+              <option value="both">Datenbank + Sammlung</option>
+            </select>
+          </div>
+          <div class="admin-actions">
+            <button class="btn-primary" onclick="App.adminCreateCard()">Karte erstellen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARTEN VERWALTEN -->
+      <div class="admin-section" id="admin-manage-cards">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">▤ Karten verwalten</div>
+        <div class="admin-section-body">
+          <div class="form-row">
+            <label>Karte auswählen</label>
+            <select id="am-card-select" onchange="App.adminLoadCardToEdit()">
+              <option value="">— Karte wählen —</option>
+              ${this.state.cards.slice().reverse().slice(0, 80).map(c => 
+                `<option value="${c.id}">${c.name} (${c.rarityName})${c.isCustom?' ★':''}</option>`
+              ).join('')}
+            </select>
+          </div>
+          <div id="am-edit-fields" style="display:none">
+            <div class="form-row"><label>Name</label><input id="am-name" /></div>
+            <div class="form-row"><label>Wert</label><input type="number" id="am-value" /></div>
+            <div class="form-row">
+              <label>Seltenheit</label>
+              <select id="am-rarity">
+                ${RARITIES.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-row"><label>Neues Artwork</label><input type="file" id="am-artwork" accept="image/*" /></div>
+            <div class="admin-actions">
+              <button class="quick-btn gold" onclick="App.adminUpdateCard()">Speichern</button>
+              <button class="quick-btn" onclick="App.adminAddToCollection()">Zur Sammlung ×1</button>
+              <button class="quick-btn" onclick="App.adminAddToCollection(5)">Zur Sammlung ×5</button>
+              <button class="quick-btn" style="color:var(--danger)" onclick="App.adminDeleteCard()">Löschen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PACK VERWALTUNG -->
+      <div class="admin-section" id="admin-packs">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">▣ Pack-Verwaltung</div>
+        <div class="admin-section-body">
+          <div class="form-row">
+            <label>Pack auswählen</label>
+            <select id="ap-pack-select">
+              ${this.state.packs.map(p => `<option value="${p.id}">${p.name} (${p.price})</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-row"><label>Neuer Preis</label><input type="number" id="ap-price" /></div>
+          <div class="admin-actions">
+            <button class="quick-btn gold" onclick="App.adminUpdatePackPrice()">Preis ändern</button>
+            <button class="quick-btn" onclick="App.adminTogglePack()">Aktivieren / Deaktivieren</button>
+          </div>
+          <hr style="border-color:rgba(255,255,255,0.08);margin:16px 0" />
+          <div class="form-row"><label>Neues Pack – Name</label><input id="ap-new-name" placeholder="Mein Custom Pack" /></div>
+          <div class="form-row"><label>Preis</label><input type="number" id="ap-new-price" value="500" /></div>
+          <div class="form-row"><label>Kartenanzahl</label><input type="number" id="ap-new-cards" value="5" /></div>
+          <div class="admin-actions">
+            <button class="btn-primary" onclick="App.adminCreatePack()">Pack erstellen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PULL CONTROL -->
+      <div class="admin-section" id="admin-pull">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">◎ Pull-Control</div>
+        <div class="admin-section-body">
+          <div class="form-row">
+            <label>Nächsten Pull erzwingen (Karten-ID oder Seltenheit)</label>
+            <input id="apull-force" placeholder="card_xxx oder secret / hyper / ultra..." />
+          </div>
+          <div class="admin-actions">
+            <button class="quick-btn gold" onclick="App.adminForcePull()">Erzwingen</button>
+            <button class="quick-btn" onclick="App.state.forceNext=null;App.saveState();App.toast('Force deaktiviert')">Zurücksetzen</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:8px">
+            Aktuell: ${this.state.forceNext ? this.state.forceNext : 'Normales Zufallssystem'}
+          </p>
+        </div>
+      </div>
+
+      <!-- SAMMLUNG -->
+      <div class="admin-section" id="admin-collection">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">▤ Sammlungsverwaltung</div>
+        <div class="admin-section-body">
+          <div class="admin-actions">
+            <button class="quick-btn" onclick="App.adminGiveRandom(10)">+10 zufällige Karten</button>
+            <button class="quick-btn" onclick="App.adminGiveAllOfRarity('secret')">Alle Secret Rare geben</button>
+            <button class="quick-btn" onclick="App.adminClearCollection()">Sammlung leeren</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPIEL -->
+      <div class="admin-section" id="admin-game">
+        <div class="admin-section-header" onclick="this.parentElement.classList.toggle('open')">⚙ Spielverwaltung</div>
+        <div class="admin-section-body">
+          <div class="admin-actions">
+            <button class="quick-btn" onclick="App.adminResetStats()">Statistiken zurücksetzen</button>
+            <button class="quick-btn" onclick="App.saveState();App.toast('Spielstand gespeichert','success')">Speichern</button>
+            <button class="btn-danger" onclick="App.resetGame()">Gesamtes Spiel zurücksetzen</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <button class="btn-secondary" onclick="App.navigate('home')">Zurück zum Spiel</button>
+      </div>
+    </div>
+  `;
+};
+
+// ===== ADMIN ACTIONS =====
+
+App.adminAddCoins = function() {
+  const amount = parseInt(document.getElementById('admin-coin-amount').value) || 0;
+  this.state.coins = Math.max(0, this.state.coins + amount);
+  this.saveState();
+  this.updateCoins();
+  this.toast(`${amount >= 0 ? '+' : ''}${amount} Coins`, 'success');
+};
+
+App.adminSetCoins = function(amount) {
+  this.state.coins = amount;
+  this.saveState();
+  this.updateCoins();
+  this.toast(`Coins auf ${this.formatNumber(amount)} gesetzt`, 'success');
+};
+
+App.adminToggleInfinite = function() {
+  this.state.infiniteCoins = !this.state.infiniteCoins;
+  this.saveState();
+  this.render();
+  this.toast(this.state.infiniteCoins ? 'Unendlich Coins aktiviert' : 'Unendlich Coins deaktiviert');
+};
+
+App.adminCreateCard = async function() {
+  const name = document.getElementById('ac-name').value.trim();
+  if (!name) {
+    this.toast('Name erforderlich', 'error');
+    return;
+  }
+
+  const creature = document.getElementById('ac-creature').value.trim() || name;
+  let id = document.getElementById('ac-id').value.trim() || `card_custom_${Date.now()}`;
+  const rarity = document.getElementById('ac-rarity').value;
+  const type = document.getElementById('ac-type').value;
+  const element = document.getElementById('ac-element').value.trim() || 'Aether';
+  const value = parseInt(document.getElementById('ac-value').value) || 100;
+  const desc = document.getElementById('ac-desc').value.trim();
+  const style = document.getElementById('ac-style').value;
+  const action = document.getElementById('ac-action').value;
+
+  const rarityObj = RARITIES.find(r => r.id === rarity) || RARITIES[0];
+  const styleObj = ARTWORK_STYLES.find(s => s.id === style) || ARTWORK_STYLES[0];
+
+  let artwork = null;
+  const fileInput = document.getElementById('ac-artwork');
+  if (fileInput.files && fileInput.files[0]) {
+    artwork = await this.readFileAsDataURL(fileInput.files[0]);
+    // Store in IndexedDB
+    await Storage.saveImage(id, artwork);
+  }
+
+  const card = {
+    id,
+    name,
+    pokemon: creature,
+    creature,
+    type,
+    element,
+    rarity,
+    rarityName: rarityObj.name,
+    style,
+    styleName: styleObj.name,
+    value,
+    description: desc || `Eine einzigartige ${element} ${type}-Karte.`,
+    isCustom: true,
+    isHolo: ['reverse', 'fullart', 'gold', 'rainbow', 'secret', 'special'].includes(style),
+    isGold: style === 'gold',
+    isRainbow: style === 'rainbow' || rarity === 'secret',
+    artwork
+  };
+
+  // Save to IndexedDB
+  await Storage.saveCustomCard(card);
+
+  // Add to runtime
+  const existing = this.state.cards.findIndex(c => c.id === id);
+  if (existing >= 0) this.state.cards[existing] = card;
+  else this.state.cards.push(card);
+
+  if (action === 'collection' || action === 'both') {
+    this.state.collection[id] = (this.state.collection[id] || 0) + 1;
+  }
+
+  this.saveState();
+  this.toast(`Karte "${name}" erstellt!`, 'success');
+  this.render();
+};
+
+App.readFileAsDataURL = function(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+App.adminLoadCardToEdit = function() {
+  const id = document.getElementById('am-card-select').value;
+  const fields = document.getElementById('am-edit-fields');
+  if (!id) {
+    fields.style.display = 'none';
+    return;
+  }
+  const card = this.getCard(id);
+  if (!card) return;
+  fields.style.display = 'block';
+  document.getElementById('am-name').value = card.name;
+  document.getElementById('am-value').value = card.value;
+  document.getElementById('am-rarity').value = card.rarity;
+};
+
+App.adminUpdateCard = async function() {
+  const id = document.getElementById('am-card-select').value;
+  const card = this.getCard(id);
+  if (!card) return;
+
+  card.name = document.getElementById('am-name').value.trim() || card.name;
+  card.value = parseInt(document.getElementById('am-value').value) || card.value;
+  const rarity = document.getElementById('am-rarity').value;
+  card.rarity = rarity;
+  card.rarityName = (RARITIES.find(r => r.id === rarity) || {}).name || rarity;
+
+  const fileInput = document.getElementById('am-artwork');
+  if (fileInput.files && fileInput.files[0]) {
+    card.artwork = await this.readFileAsDataURL(fileInput.files[0]);
+    await Storage.saveImage(id, card.artwork);
+  }
+
+  if (card.isCustom) {
+    await Storage.saveCustomCard(card);
+  }
+
+  this.saveState();
+  this.toast('Karte aktualisiert', 'success');
+  this.render();
+};
+
+App.adminAddToCollection = function(amount = 1) {
+  const id = document.getElementById('am-card-select').value;
+  if (!id) return;
+  this.state.collection[id] = (this.state.collection[id] || 0) + amount;
+  this.saveState();
+  this.toast(`+${amount} zur Sammlung`, 'success');
+};
+
+App.adminDeleteCard = async function() {
+  const id = document.getElementById('am-card-select').value;
+  if (!id) return;
+  if (!confirm('Karte wirklich löschen?')) return;
+
+  this.state.cards = this.state.cards.filter(c => c.id !== id);
+  delete this.state.collection[id];
+  await Storage.deleteCustomCard(id);
+  await Storage.deleteImage(id);
+  this.saveState();
+  this.toast('Karte gelöscht', 'success');
+  this.render();
+};
+
+App.adminUpdatePackPrice = function() {
+  const id = document.getElementById('ap-pack-select').value;
+  const price = parseInt(document.getElementById('ap-price').value);
+  const pack = this.state.packs.find(p => p.id === id);
+  if (!pack || isNaN(price)) return;
+  pack.price = price;
+  this.saveState();
+  this.toast('Preis aktualisiert', 'success');
+  this.render();
+};
+
+App.adminTogglePack = function() {
+  const id = document.getElementById('ap-pack-select').value;
+  const pack = this.state.packs.find(p => p.id === id);
+  if (!pack) return;
+  pack.disabled = !pack.disabled;
+  this.saveState();
+  this.toast(pack.disabled ? 'Pack deaktiviert' : 'Pack aktiviert');
+  this.render();
+};
+
+App.adminCreatePack = function() {
+  const name = document.getElementById('ap-new-name').value.trim();
+  if (!name) {
+    this.toast('Name erforderlich', 'error');
+    return;
+  }
+  const price = parseInt(document.getElementById('ap-new-price').value) || 500;
+  const cards = parseInt(document.getElementById('ap-new-cards').value) || 5;
+  const id = 'pack_' + Date.now();
+
+  this.state.packs.push({
+    id,
+    name,
+    price,
+    color: 'linear-gradient(145deg, #2a2a3a, #15151e)',
+    accent: '#d4af37',
+    cards,
+    guaranteed: ['rare'],
+    rates: { common: 20, uncommon: 25, rare: 30, double: 15, ultra: 7, illustration: 3 }
+  });
+  this.saveState();
+  this.toast(`Pack "${name}" erstellt`, 'success');
+  this.render();
+};
+
+App.adminForcePull = function() {
+  const val = document.getElementById('apull-force').value.trim();
+  if (!val) return;
+  this.state.forceNext = val;
+  this.saveState();
+  this.toast(`Nächster Pull erzwungen: ${val}`, 'success');
+  this.render();
+};
+
+App.adminGiveRandom = function(n) {
+  for (let i = 0; i < n; i++) {
+    const card = this.state.cards[Math.floor(Math.random() * this.state.cards.length)];
+    this.state.collection[card.id] = (this.state.collection[card.id] || 0) + 1;
+  }
+  this.saveState();
+  this.toast(`+${n} zufällige Karten`, 'success');
+};
+
+App.adminGiveAllOfRarity = function(rarity) {
+  const cards = this.state.cards.filter(c => c.rarity === rarity);
+  cards.forEach(c => {
+    this.state.collection[c.id] = (this.state.collection[c.id] || 0) + 1;
+  });
+  this.saveState();
+  this.toast(`${cards.length} ${rarity}-Karten hinzugefügt`, 'success');
+};
+
+App.adminClearCollection = function() {
+  if (!confirm('Sammlung wirklich leeren?')) return;
+  this.state.collection = {};
+  this.saveState();
+  this.toast('Sammlung geleert');
+  this.render();
+};
+
+App.adminResetStats = function() {
+  if (!confirm('Statistiken zurücksetzen?')) return;
+  this.state.stats = {
+    packsOpened: 0, cardsPulled: 0, rarePulls: 0, holoPulls: 0,
+    cardsSold: 0, totalSpent: 0, totalEarned: 0, rarestPull: null, binderPages: 0
+  };
+  this.saveState();
+  this.toast('Statistiken zurückgesetzt');
+  this.render();
+};
+
+  </script>
+</body>
+</html>
